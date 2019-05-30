@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Pickup.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class BATTERYCOLLECTOR_API APickup : public AActor
 {
 	GENERATED_BODY()
