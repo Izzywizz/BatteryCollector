@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/SubclassOf.h" // TSubClassOf
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
+#include "Pickup.h"
+#include "Engine/EngineTypes.h" //FTimeHandle
 #include "SpawnVolume.generated.h"
 
 UCLASS(Blueprintable)
@@ -20,6 +23,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// The pickup to spawn
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TSubclassOf<APickup> WhatToSpawn;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -30,9 +37,23 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Spawning")
 	FVector GetRandomPointInVolume();
 
+	FTimerHandle SpawnTimer;
+
+	// Minimum spawn delay
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Spawning")
+	float SpawnDelayRangeLow;
+	// Maximum spawn delay
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Spawning")
+	float SpawnDelayRangeHigh;
+
 private:
 //Box Component to specifiy where pickups should be spawned
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	class UBoxComponent* WhereToSpawn;
 
+	// Handle spawing a new pickup, cannot be called from another class
+	void SpawnPickup();
+
+	// Current spawn delay
+	float SpawnDelay;
 };
