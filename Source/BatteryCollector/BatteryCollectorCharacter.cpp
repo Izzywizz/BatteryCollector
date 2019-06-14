@@ -7,8 +7,10 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "Pickup.h" // For allowing the pickup of objects
 #include "GameFramework/SpringArmComponent.h"
 
+#define OUT //Just a reminder that this 
 //////////////////////////////////////////////////////////////////////////
 // ABatteryCollectorCharacter
 
@@ -61,6 +63,8 @@ void ABatteryCollectorCharacter::SetupPlayerInputComponent(class UInputComponent
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	PlayerInputComponent->BindAction("Collect", IE_Pressed, this, &ABatteryCollectorCharacter::CollectPickups);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABatteryCollectorCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ABatteryCollectorCharacter::MoveRight);
@@ -136,4 +140,26 @@ void ABatteryCollectorCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ABatteryCollectorCharacter::CollectPickups()
+{
+	// Get all overlapping actors and store them in an array
+	TArray<AActor*> CollectedActors;
+	CollectionSphere->GetOverlappingActors(CollectedActors);
+	// For each Actor we collected
+	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+	{
+		// Caast the actor to APickup
+		APickup* const TestPickup = Cast<APickup>(CollectedActors[iCollected]);
+			// if the cast is succcesful and the pickup is valid and active
+			if(TestPickup && !TestPickup->IsPendingKill() && TestPickup->IsActive())
+			{
+				// call the pickup's WasCollected()
+				TestPickup->WasCollected();
+				// deactivate the pickup
+				TestPickup->SetActive(false);
+			}
+	}
+
 }
