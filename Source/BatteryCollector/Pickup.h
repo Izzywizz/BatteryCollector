@@ -36,6 +36,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void SetActive(bool NewPickupState);
 
+	// Function to call when the pickup is collected
+	UFUNCTION(BlueprintNativeEvent, Category = "Pickup")
+	void WasCollected();
+	virtual void WasCollected_Implementation(); //overiiden for child class you only call WasCollected
+
 private:
 // Static mesh ro represent the pickup in the level
 UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
